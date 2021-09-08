@@ -123,10 +123,35 @@ table {
 	border-spacing: 0;
 }
 
+/* main style */
 body {
 	background: #3f3f3f;
 	width: 1200px;
 	margin: 0 auto;
+}
+
+button {
+	padding: 6px;
+	font-size: 18px;
+	font-weight: 500;
+	border-radius: 5px;
+}
+
+button:hover {
+	color: #fff;
+	/* border: solid 2px #000; */
+	background: #3f3f3f;
+}
+
+.user_info_modal img {
+	width: 64px;
+	max-height: 100px;
+}
+
+#user_name {
+	color: #fff;
+	margin-left: 16px;
+	font-size: 26px;
 }
 
 header {
@@ -141,6 +166,13 @@ section {
 	padding: 16px;
 }
 
+[id^='button_section_rig_'] {
+	/* background: #ff0000; */
+	margin: 16px 0;
+}
+[id^='button_section_rig_'] button {
+	margin-right: 16px;
+}
 table {
 	width: 100%;
 	background: rgb(48, 47, 47);

@@ -1,7 +1,7 @@
 const wrapper = document.querySelector('.wrapper');
 
 const getData = async () => {
-	const data = await fetch('test.json');
+	const data = await fetch('stat');
 	// console.error(data.json();)
 	return data.json();
 };
@@ -36,17 +36,21 @@ const baseMarkup = () => {
 				section.append(tableDeviceStats);
 			}
 
+			const buttonSection = document.createElement('div');
+			buttonSection.setAttribute('id', `button_section_rig_${i}`);
+			section.append(buttonSection);
+
 			const buttonReboot = document.createElement('button');
 			buttonReboot.innerHTML = `перезагрузить`;
 			buttonReboot.setAttribute('onclick', `rebootRig(${i})`);
 			buttonReboot.setAttribute('id', `reboot_rig_${i}`);
-			section.append(buttonReboot);
+			buttonSection.append(buttonReboot);
 
 			const buttonDelete = document.createElement('button');
 			buttonDelete.innerHTML = `удалить`;
 			buttonDelete.setAttribute('onclick', `removeRig(${i})`);
 			buttonDelete.setAttribute('id', `remove_rig_${i}`);
-			section.append(buttonDelete);
+			buttonSection.append(buttonDelete);
 
 			const buttonMoreInfo = document.createElement('button');
 			buttonMoreInfo.innerHTML = `подробней`;
@@ -57,7 +61,7 @@ const baseMarkup = () => {
 				// buttonMoreInfo.removeAttribute('onclick');
 			}
 
-			section.append(buttonMoreInfo);
+			buttonSection.append(buttonMoreInfo);
 		}
 	});
 };
