@@ -1,7 +1,8 @@
 const wrapper = document.querySelector('.wrapper');
+const serverIp = '109.87.25.33:4000';
 
 const getData = async () => {
-	const data = await fetch('stat');
+	const data = await fetch(serverIp + '/stat');
 	// console.error(data.json();)
 	return data.json();
 };
@@ -316,7 +317,7 @@ setInterval(function () {
 // ДОБАВИТЬ РИГ
 
 const getAllClients = async () => {
-	await fetch('/getAllOnline').then(response =>
+	await fetch(serverIp + '/getAllOnline').then(response =>
 		response.text().then(response => {
 			renderWindowAllClients(response.split('\r\n'));
 		})
@@ -339,7 +340,7 @@ const renderWindowAllClients = response => {
 const chooseRigOnModalWindow = res => {
 	console.log(res + '');
 
-	fetch(`/addRig/${res}`).then(function (response) {
+	fetch(serverIp + `/addRig/${res}`).then(function (response) {
 		console.warn(response.text());
 	});
 	location.reload();
@@ -374,7 +375,9 @@ const rebootRig = i => {
 	const buttonReboot = document.querySelector(`#id_${i}`);
 	// console.log(buttonReboot.innerHTML)
 
-	fetch(`/rebootRig/${buttonReboot.innerHTML}`).then(function (response) {
+	fetch(serverIp + `/rebootRig/${buttonReboot.innerHTML}`).then(function (
+		response
+	) {
 		console.log(response.text());
 	});
 };
@@ -386,7 +389,9 @@ const removeRig = i => {
 	// console.log(buttonRemove.innerHTML)
 
 	// fetch('/removeRig/127.0.0.1:3333')
-	fetch(`/removeRig/${buttonRemove.innerHTML}`).then(function (response) {
+	fetch(serverIp + `/removeRig/${buttonRemove.innerHTML}`).then(function (
+		response
+	) {
 		console.log(response.text());
 	});
 	location.reload();
