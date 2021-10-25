@@ -1,5 +1,5 @@
 const wrapper = document.querySelector('.wrapper');
-const serverIp = '109.87.25.33:4000';
+const serverIp = 'http://109.87.25.33:4000';
 
 const getData = async () => {
 	const data = await fetch(serverIp + '/stat');
