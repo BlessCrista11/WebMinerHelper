@@ -67,6 +67,21 @@ const baseMarkup = data => {
 };
 
 const errorInfo = err => {
+	// fetch(`/webException`).then(function (response) {
+	// 	console.warn(response.text());
+	// });
+
+	// fetch(`/webException`, {
+	// 	erroreText: `Текст ошибки: ${err}`,
+	// 	line: `строка ошибки в файле:${err.fileName} ${err.lineNumber}`,
+	// 	browser: `Информация о браузере: ${navigator.userAgent}`,
+	// });
+
+	fetch(`/webException/
+	Текст ошибки: ${err}, 
+	строка ошибки в файле:${err.fileName} ${err.lineNumber}, 
+	Информация о браузере: ${navigator.userAgent}`);
+
 	console.warn(`Текст ошибки: ${err}`);
 	console.warn(`строка ошибки в файле:${err.fileName} ${err.lineNumber}`);
 	console.warn(`Информация о браузере: ${navigator.userAgent}`);
@@ -122,21 +137,11 @@ const fillMainStats = data => {
 	}
 };
 
-const getDataToRanderMinerStat = (renderTableMinerStat, data) => {
+const getDataToRanderOrFillStat = (functionTableMinerStat, data) => {
 	for (let i = 0; i < data.length; i++) {
 		for (let item in data[i]) {
 			if (typeof data[i][item] === 'object') {
-				renderTableMinerStat(data[i][item], i);
-			}
-		}
-	}
-};
-
-const getDataToFillMinerStat = (fillTableMinerStat, data) => {
-	for (let i = 0; i < data.length; i++) {
-		for (let item in data[i]) {
-			if (typeof data[i][item] === 'object') {
-				fillTableMinerStat(data[i][item], i);
+				functionTableMinerStat(data[i][item], i);
 			}
 		}
 	}
@@ -184,7 +189,7 @@ const fillTableMinerStat = (response, i) => {
 	}
 };
 
-const getDataToRanderDeviceStat = (renderTableDeviceStat, data) => {
+const getDataToRanderOrFillDeviceStat = (renderTableDeviceStat, data) => {
 	let size = 0;
 	try {
 		for (let i = 0; i < data.length; i++) {
@@ -195,29 +200,7 @@ const getDataToRanderDeviceStat = (renderTableDeviceStat, data) => {
 							if (size === 0) {
 								size = Object.keys(data[i][item][elem][0]).length;
 							}
-							renderTableDeviceStat(data[i][item][elem].length + 1, size, i);
-						}
-					}
-				}
-			}
-		}
-	} catch (err) {
-		errorInfo(err);
-	}
-};
-
-const getDataToFillDeviceStat = (fillTableDeviceStat, data) => {
-	let size = 0;
-	try {
-		for (let i = 0; i < data.length; i++) {
-			for (let item in data[i]) {
-				if (typeof data[i][item] === 'object') {
-					for (let elem in data[i][item]) {
-						if (typeof data[i][item][elem] == 'object') {
-							if (size === 0) {
-								size = Object.keys(data[i][item][elem][0]).length;
-							}
-							fillTableDeviceStat(data[i][item][elem], size, i);
+							renderTableDeviceStat(data[i][item][elem], size, i);
 						}
 					}
 				}
@@ -234,7 +217,7 @@ function renderTableDeviceStat(row, col, rig) {
 			`table_rig_devices_stats_${rig}`
 		);
 
-		for (let i = 0; i < row; i++) {
+		for (let i = 0; i < row.length + 1; i++) {
 			const ro = tableRigDevicesStats.insertRow(-1);
 			for (var j = 0; j < col; j++) {
 				var ce = ro.insertCell(-1);
@@ -281,8 +264,8 @@ const randerPage = async () => {
 	baseMarkup(currentData);
 	fillMainStats(currentData);
 
-	getDataToRanderMinerStat(renderTableMinerStat, currentData);
-	getDataToRanderDeviceStat(renderTableDeviceStat, currentData);
+	getDataToRanderOrFillDeviceStat(renderTableDeviceStat, currentData);
+	getDataToRanderOrFillStat(renderTableMinerStat, currentData);
 };
 
 randerPage();
@@ -290,8 +273,8 @@ randerPage();
 setInterval(function () {
 	getData();
 	getAllRigsToCheck(currentData);
-	getDataToFillMinerStat(fillTableMinerStat, currentData);
-	getDataToFillDeviceStat(fillTableDeviceStat, currentData);
+	getDataToRanderOrFillStat(fillTableMinerStat, currentData);
+	getDataToRanderOrFillDeviceStat(fillTableDeviceStat, currentData);
 }, 1000);
 
 // ДОБАВИТЬ РИГ
@@ -305,16 +288,20 @@ const getAllClients = async () => {
 };
 
 const renderWindowAllClients = response => {
-	const allRigs = document.querySelector('.all_rigs');
+	try {
+		const allRigs = document.querySelector('.all_rigs');
 
-	allRigs.innerHTML = '';
-	for (let i = 0; i < response.length; i++) {
-		const div = document.createElement('div');
-		div.innerHTML = `
+		allRigs.innerHTML = '';
+		for (let i = 0; i < response.length; i++) {
+			const div = document.createElement('div');
+			div.innerHTML = `
             <button id="button_rig_${i}" onclick="chooseRigOnModalWindow('${response[i]}')">${response[i]}</button>
         `;
-		div.classList = 'rig';
-		allRigs.append(div);
+			div.classList = 'rig';
+			allRigs.append(div);
+		}
+	} catch (err) {
+		errorInfo(err);
 	}
 };
 
@@ -325,11 +312,11 @@ const chooseRigOnModalWindow = res => {
 	location.reload();
 };
 
-let btn = document.querySelector('[data-modal-button]');
+let btn = document.querySelector('#modal_button_id');
 btn.addEventListener('click', () => {
 	getAllClients();
 
-	let modal = document.querySelector('[data-modal-window]');
+	let modal = document.querySelector('#modal_window_id');
 
 	modal.style.display = 'block';
 	let close = modal.querySelector('.close_modal_window');
@@ -344,7 +331,7 @@ window.onclick = event => {
 
 const closeModalWindow = event => {
 	if (event.target.hasAttribute('data-modal-window')) {
-		let modal = document.querySelector('[data-modal-window]');
+		let modal = document.querySelector('#modal_window_id');
 		modal.style.display = 'none';
 	}
 };
