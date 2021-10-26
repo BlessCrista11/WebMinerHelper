@@ -1,72 +1,70 @@
 const wrapper = document.querySelector('.wrapper');
-const serverIp = 'http://109.87.25.33:4000';
+var currentData = null;
 
 const getData = async () => {
-	const data = await fetch(serverIp + '/stat');
-	// console.error(data.json();)
-	return data.json();
+	currentData = await fetch('/stat')
+		.then(response => response.json())
+		.then(response => {
+			return response;
+		});
 };
 
-const baseMarkup = () => {
-	getData().then(data => {
-		for (let i = 0; i < data.length; i++) {
-			const section = document.createElement('section');
-			// section.className = `table_rig_${i}`; сделать единый класс для стилизации
-			section.setAttribute('id', `table_rig_${i}`);
-			wrapper.append(section);
+const baseMarkup = data => {
+	for (let i = 0; i < data.length; i++) {
+		const section = document.createElement('section');
+		// section.className = `table_rig_${i}`; сделать единый класс для стилизации
+		section.setAttribute('id', `table_rig_${i}`);
+		wrapper.append(section);
 
-			const tableMainStats = document.createElement('div');
-			tableMainStats.setAttribute('id', `table_rig_miner_stats_main_${i}`);
-			tableMainStats.classList = 'table_rig_miner_stats_main';
-			if (data[i].miner_data) {
-				tableMainStats.addEventListener('click', () => {
-					toggleStateTableStats(i);
-				});
-			}
-
-			section.append(tableMainStats);
-			if (data[i].miner_data) {
-				const tableMinerStats = document.createElement('table');
-				tableMinerStats.setAttribute('id', `table_rig_miner_stats_${i}`);
-				tableMinerStats.setAttribute('style', `display:none`);
-				section.append(tableMinerStats);
-
-				const tableDeviceStats = document.createElement('table');
-				tableDeviceStats.setAttribute('id', `table_rig_devices_stats_${i}`);
-				tableDeviceStats.setAttribute('style', `display:none`);
-				section.append(tableDeviceStats);
-			}
-
-			const buttonSection = document.createElement('div');
-			buttonSection.setAttribute('id', `button_section_rig_${i}`);
-			section.append(buttonSection);
-
-			const buttonReboot = document.createElement('button');
-			buttonReboot.innerHTML = `перезагрузить`;
-			buttonReboot.setAttribute('onclick', `rebootRig(${i})`);
-			buttonReboot.setAttribute('id', `reboot_rig_${i}`);
-			buttonSection.append(buttonReboot);
-
-			const buttonDelete = document.createElement('button');
-			buttonDelete.innerHTML = `удалить`;
-			buttonDelete.setAttribute('onclick', `removeRig(${i})`);
-			buttonDelete.setAttribute('id', `remove_rig_${i}`);
-			buttonSection.append(buttonDelete);
-
-			const buttonMoreInfo = document.createElement('button');
-			buttonMoreInfo.innerHTML = `подробней`;
-			buttonMoreInfo.setAttribute('onclick', `toggleStateTableStats(${i})`);
-			buttonMoreInfo.setAttribute('id', `more_info_rig_${i}`);
-			if (!data[i].miner_data) {
-				buttonMoreInfo.setAttribute('disabled', true);
-				// buttonMoreInfo.removeAttribute('onclick');
-			}
-
-			buttonSection.append(buttonMoreInfo);
+		const tableMainStats = document.createElement('div');
+		tableMainStats.setAttribute('id', `table_rig_miner_stats_main_${i}`);
+		tableMainStats.classList = 'table_rig_miner_stats_main';
+		if (data[i].miner_data) {
+			tableMainStats.addEventListener('click', () => {
+				toggleStateTableStats(i);
+			});
 		}
-	});
+
+		section.append(tableMainStats);
+		if (data[i].miner_data) {
+			const tableMinerStats = document.createElement('table');
+			tableMinerStats.setAttribute('id', `table_rig_miner_stats_${i}`);
+			tableMinerStats.setAttribute('style', `display:none`);
+			section.append(tableMinerStats);
+
+			const tableDeviceStats = document.createElement('table');
+			tableDeviceStats.setAttribute('id', `table_rig_devices_stats_${i}`);
+			tableDeviceStats.setAttribute('style', `display:none`);
+			section.append(tableDeviceStats);
+		}
+
+		const buttonSection = document.createElement('div');
+		buttonSection.setAttribute('id', `button_section_rig_${i}`);
+		section.append(buttonSection);
+
+		const buttonReboot = document.createElement('button');
+		buttonReboot.innerHTML = `перезагрузить`;
+		buttonReboot.setAttribute('onclick', `rebootRig(${i})`);
+		buttonReboot.setAttribute('id', `reboot_rig_${i}`);
+		buttonSection.append(buttonReboot);
+
+		const buttonDelete = document.createElement('button');
+		buttonDelete.innerHTML = `удалить`;
+		buttonDelete.setAttribute('onclick', `removeRig(${i})`);
+		buttonDelete.setAttribute('id', `remove_rig_${i}`);
+		buttonSection.append(buttonDelete);
+
+		const buttonMoreInfo = document.createElement('button');
+		buttonMoreInfo.innerHTML = `подробней`;
+		buttonMoreInfo.setAttribute('onclick', `toggleStateTableStats(${i})`);
+		buttonMoreInfo.setAttribute('id', `more_info_rig_${i}`);
+		if (!data[i].miner_data) {
+			buttonMoreInfo.setAttribute('disabled', true);
+		}
+
+		buttonSection.append(buttonMoreInfo);
+	}
 };
-baseMarkup();
 
 const errorInfo = err => {
 	console.warn(`Текст ошибки: ${err}`);
@@ -77,92 +75,71 @@ const errorInfo = err => {
 
 var oldMassId = [];
 var currentMassId = [];
-const getAllRigsToCheck = () => {
-	getData().then(data => {
-		for (let i = 0; i < data.length; i++) {
-			// console.log(data.length)
-
-			for (let item in data[i]) {
-				if (typeof data[i][item] !== 'object' && item === 'id') {
-					currentMassId.push(data[i][item]);
-				}
+const getAllRigsToCheck = data => {
+	for (let i = 0; i < data.length; i++) {
+		for (let item in data[i]) {
+			if (typeof data[i][item] !== 'object' && item === 'id') {
+				currentMassId.push(data[i][item]);
 			}
 		}
+	}
 
-		if (oldMassId.length === currentMassId.length || oldMassId.length === 0) {
-			// console.log('odinakovie');
-			for (let i = 0; i < currentMassId.length; i++) {
-				if (oldMassId[i] !== undefined && oldMassId[i] !== currentMassId[i]) {
-					console.log('old - undefined');
-					location.reload();
-					// console.log('stariy', oldMassId[i]);
-					// console.log('tekusiy', currentMassId[i]);
-					// console.log('------');
-				}
+	if (oldMassId.length === currentMassId.length || oldMassId.length === 0) {
+		for (let i = 0; i < currentMassId.length; i++) {
+			if (oldMassId[i] !== undefined && oldMassId[i] !== currentMassId[i]) {
+				console.log('old - undefined');
+				location.reload();
 			}
-		} else {
-			console.log('raznie');
-			location.reload();
 		}
+	} else {
+		console.log('raznie');
+		location.reload();
+	}
 
-		oldMassId = currentMassId;
-		currentMassId = [];
-		// oldMassId = []
-	});
+	oldMassId = currentMassId;
+	currentMassId = [];
 };
 
-const fillMainStats = () => {
-	getData().then(data => {
-		try {
-			for (let i = 0; i < data.length; i++) {
-				const curentRig = document.getElementById(
-					`table_rig_miner_stats_main_${i}`
-				);
+const fillMainStats = data => {
+	try {
+		for (let i = 0; i < data.length; i++) {
+			const curentRig = document.getElementById(
+				`table_rig_miner_stats_main_${i}`
+			);
 
-				for (let item in data[i]) {
-					if (typeof data[i][item] !== 'object') {
-						// console.log(item)
-						curentRig.innerHTML += `
+			for (let item in data[i]) {
+				if (typeof data[i][item] !== 'object') {
+					curentRig.innerHTML += `
 							<div>
 								<span id="${item}_${i}">${data[i][item]}</span>
 							</div>
 							`;
-					}
 				}
 			}
-		} catch (err) {
-			// console.log('ошибка в fillMainStats' + err);
-			errorInfo(err);
 		}
-	});
+	} catch (err) {
+		errorInfo(err);
+	}
 };
 
-fillMainStats();
-
-const getDataToRanderMinerStat = renderTableMinerStat => {
-	getData().then(data => {
-		for (let i = 0; i < data.length; i++) {
-			for (let item in data[i]) {
-				if (typeof data[i][item] === 'object') {
-					// console.log(data[i][item])
-					renderTableMinerStat(data[i][item], i);
-				}
+const getDataToRanderMinerStat = (renderTableMinerStat, data) => {
+	for (let i = 0; i < data.length; i++) {
+		for (let item in data[i]) {
+			if (typeof data[i][item] === 'object') {
+				renderTableMinerStat(data[i][item], i);
 			}
 		}
-	});
+	}
 };
 
-const getDataToFillMinerStat = fillTableMinerStat => {
-	getData().then(data => {
-		for (let i = 0; i < data.length; i++) {
-			for (let item in data[i]) {
-				if (typeof data[i][item] === 'object') {
-					// console.log(data[i][item])
-					fillTableMinerStat(data[i][item], i);
-				}
+const getDataToFillMinerStat = (fillTableMinerStat, data) => {
+	for (let i = 0; i < data.length; i++) {
+		for (let item in data[i]) {
+			if (typeof data[i][item] === 'object') {
+				fillTableMinerStat(data[i][item], i);
 			}
 		}
-	});
+	}
 };
 
 const renderTableMinerStat = (content, i) => {
@@ -207,53 +184,48 @@ const fillTableMinerStat = (response, i) => {
 	}
 };
 
-const getDataToRanderDeviceStat = renderTableDeviceStat => {
-	getData().then(data => {
-		let size = 0;
-		try {
-			for (let i = 0; i < data.length; i++) {
-				for (let item in data[i]) {
-					if (typeof data[i][item] === 'object') {
-						for (let elem in data[i][item]) {
-							if (typeof data[i][item][elem] == 'object') {
-								if (size === 0) {
-									size = Object.keys(data[i][item][elem][0]).length;
-								}
-								renderTableDeviceStat(data[i][item][elem].length + 1, size, i);
+const getDataToRanderDeviceStat = (renderTableDeviceStat, data) => {
+	let size = 0;
+	try {
+		for (let i = 0; i < data.length; i++) {
+			for (let item in data[i]) {
+				if (typeof data[i][item] === 'object') {
+					for (let elem in data[i][item]) {
+						if (typeof data[i][item][elem] == 'object') {
+							if (size === 0) {
+								size = Object.keys(data[i][item][elem][0]).length;
 							}
+							renderTableDeviceStat(data[i][item][elem].length + 1, size, i);
 						}
 					}
 				}
 			}
-		} catch (err) {
-			errorInfo(err);
 		}
-	});
+	} catch (err) {
+		errorInfo(err);
+	}
 };
 
-const getDataToFillDeviceStat = fillTableDeviceStat => {
-	getData().then(data => {
-		let size = 0;
-		try {
-			for (let i = 0; i < data.length; i++) {
-				for (let item in data[i]) {
-					if (typeof data[i][item] === 'object') {
-						for (let elem in data[i][item]) {
-							if (typeof data[i][item][elem] == 'object') {
-								if (size === 0) {
-									size = Object.keys(data[i][item][elem][0]).length;
-								}
-								// console.log(data[i][item][elem])
-								fillTableDeviceStat(data[i][item][elem], size, i);
+const getDataToFillDeviceStat = (fillTableDeviceStat, data) => {
+	let size = 0;
+	try {
+		for (let i = 0; i < data.length; i++) {
+			for (let item in data[i]) {
+				if (typeof data[i][item] === 'object') {
+					for (let elem in data[i][item]) {
+						if (typeof data[i][item][elem] == 'object') {
+							if (size === 0) {
+								size = Object.keys(data[i][item][elem][0]).length;
 							}
+							fillTableDeviceStat(data[i][item][elem], size, i);
 						}
 					}
 				}
 			}
-		} catch (err) {
-			errorInfo(err);
 		}
-	});
+	} catch (err) {
+		errorInfo(err);
+	}
 };
 
 function renderTableDeviceStat(row, col, rig) {
@@ -304,20 +276,28 @@ function fillTableDeviceStat(data, rows, rig) {
 	}
 }
 
-getDataToRanderMinerStat(renderTableMinerStat);
-getDataToRanderDeviceStat(renderTableDeviceStat);
+const randerPage = async () => {
+	await getData();
+	baseMarkup(currentData);
+	fillMainStats(currentData);
+
+	getDataToRanderMinerStat(renderTableMinerStat, currentData);
+	getDataToRanderDeviceStat(renderTableDeviceStat, currentData);
+};
+
+randerPage();
 
 setInterval(function () {
 	getData();
-	getAllRigsToCheck();
-	getDataToFillMinerStat(fillTableMinerStat);
-	getDataToFillDeviceStat(fillTableDeviceStat);
+	getAllRigsToCheck(currentData);
+	getDataToFillMinerStat(fillTableMinerStat, currentData);
+	getDataToFillDeviceStat(fillTableDeviceStat, currentData);
 }, 1000);
 
 // ДОБАВИТЬ РИГ
 
 const getAllClients = async () => {
-	await fetch(serverIp + '/getAllOnline').then(response =>
+	await fetch('/getAllOnline').then(response =>
 		response.text().then(response => {
 			renderWindowAllClients(response.split('\r\n'));
 		})
@@ -326,6 +306,7 @@ const getAllClients = async () => {
 
 const renderWindowAllClients = response => {
 	const allRigs = document.querySelector('.all_rigs');
+
 	allRigs.innerHTML = '';
 	for (let i = 0; i < response.length; i++) {
 		const div = document.createElement('div');
@@ -338,9 +319,7 @@ const renderWindowAllClients = response => {
 };
 
 const chooseRigOnModalWindow = res => {
-	console.log(res + '');
-
-	fetch(serverIp + `/addRig/${res}`).then(function (response) {
+	fetch(`/addRig/${res}`).then(function (response) {
 		console.warn(response.text());
 	});
 	location.reload();
@@ -373,11 +352,8 @@ const closeModalWindow = event => {
 
 const rebootRig = i => {
 	const buttonReboot = document.querySelector(`#id_${i}`);
-	// console.log(buttonReboot.innerHTML)
 
-	fetch(serverIp + `/rebootRig/${buttonReboot.innerHTML}`).then(function (
-		response
-	) {
+	fetch(`/rebootRig/${buttonReboot.innerHTML}`).then(function (response) {
 		console.log(response.text());
 	});
 };
@@ -386,12 +362,8 @@ const rebootRig = i => {
 
 const removeRig = i => {
 	const buttonRemove = document.querySelector(`#id_${i}`);
-	// console.log(buttonRemove.innerHTML)
 
-	// fetch('/removeRig/127.0.0.1:3333')
-	fetch(serverIp + `/removeRig/${buttonRemove.innerHTML}`).then(function (
-		response
-	) {
+	fetch(`/removeRig/${buttonRemove.innerHTML}`).then(function (response) {
 		console.log(response.text());
 	});
 	location.reload();
