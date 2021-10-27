@@ -1,3 +1,5 @@
+//исправил обтображение данных в коротком содержании рига
+
 const wrapper = document.querySelector('.wrapper');
 var currentData = null;
 
@@ -67,16 +69,6 @@ const baseMarkup = data => {
 };
 
 const errorInfo = err => {
-	// fetch(`/webException`).then(function (response) {
-	// 	console.warn(response.text());
-	// });
-
-	// fetch(`/webException`, {
-	// 	erroreText: `Текст ошибки: ${err}`,
-	// 	line: `строка ошибки в файле:${err.fileName} ${err.lineNumber}`,
-	// 	browser: `Информация о браузере: ${navigator.userAgent}`,
-	// });
-
 	fetch(`/webException/
 	Текст ошибки: ${err}, 
 	строка ошибки в файле:${err.fileName} ${err.lineNumber}, 
@@ -90,6 +82,7 @@ const errorInfo = err => {
 
 var oldMassId = [];
 var currentMassId = [];
+
 const getAllRigsToCheck = data => {
 	for (let i = 0; i < data.length; i++) {
 		for (let item in data[i]) {
@@ -115,7 +108,29 @@ const getAllRigsToCheck = data => {
 	currentMassId = [];
 };
 
-const fillMainStats = data => {
+const chackAllRigsOnOffline = data => {
+	for (let i = 0; i < data.length; i++) {
+		if (data[i].status !== 'OK') {
+			const buttonMoreInfoOffline = document.getElementById(
+				`more_info_rig_${i}`
+			);
+
+			const tableMinerStatsOffline = document.getElementById(
+				`table_rig_miner_stats_${i}`
+			);
+			const tableDeviceStatsOffline = document.getElementById(
+				`table_rig_devices_stats_${i}`
+			);
+			if (tableMinerStatsOffline === 'null') {
+			}
+			buttonMoreInfoOffline.setAttribute('disabled', true);
+			tableMinerStatsOffline.setAttribute('style', `display:none`);
+			tableDeviceStatsOffline.setAttribute('style', `display:none`);
+		}
+	}
+};
+
+const randerMainStats = data => {
 	try {
 		for (let i = 0; i < data.length; i++) {
 			const curentRig = document.getElementById(
@@ -126,9 +141,24 @@ const fillMainStats = data => {
 				if (typeof data[i][item] !== 'object') {
 					curentRig.innerHTML += `
 							<div>
-								<span id="${item}_${i}">${data[i][item]}</span>
+								<span id="${item}_${i}"></span>
 							</div>
 							`;
+				}
+			}
+		}
+	} catch (err) {
+		errorInfo(err);
+	}
+};
+
+const fillMainStats = data => {
+	try {
+		for (let i = 0; i < data.length; i++) {
+			for (let item in data[i]) {
+				const curentRigCommonStat = document.getElementById(`${item}_${i}`);
+				if (typeof data[i][item] !== 'object') {
+					curentRigCommonStat.innerHTML = `${data[i][item]}`;
 				}
 			}
 		}
@@ -262,7 +292,7 @@ function fillTableDeviceStat(data, rows, rig) {
 const randerPage = async () => {
 	await getData();
 	baseMarkup(currentData);
-	fillMainStats(currentData);
+	randerMainStats(currentData);
 
 	getDataToRanderOrFillDeviceStat(renderTableDeviceStat, currentData);
 	getDataToRanderOrFillStat(renderTableMinerStat, currentData);
@@ -272,6 +302,9 @@ randerPage();
 
 setInterval(function () {
 	getData();
+
+	fillMainStats(currentData);
+	chackAllRigsOnOffline(currentData);
 	getAllRigsToCheck(currentData);
 	getDataToRanderOrFillStat(fillTableMinerStat, currentData);
 	getDataToRanderOrFillDeviceStat(fillTableDeviceStat, currentData);
