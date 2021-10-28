@@ -1,7 +1,6 @@
-//исправил обтображение данных в коротком содержании рига
-
 const wrapper = document.querySelector('.wrapper');
 var currentData = null;
+console.log(window.location.href);
 
 const getData = async () => {
 	currentData = await fetch('/stat')
@@ -56,6 +55,16 @@ const baseMarkup = data => {
 		buttonDelete.setAttribute('id', `remove_rig_${i}`);
 		buttonSection.append(buttonDelete);
 
+		const buttonAnyDesk = document.createElement('button');
+		buttonAnyDesk.innerHTML = `AnyDesk`;
+		buttonAnyDesk.setAttribute('onclick', `routToAnydesk(${i})`);
+		buttonAnyDesk.setAttribute('id', `anydesk_rig_${i}`);
+		buttonSection.append(buttonAnyDesk);
+
+		const divToButtonMoreInfo = document.createElement('div');
+		divToButtonMoreInfo.classList.add('button_more_info');
+		buttonSection.append(divToButtonMoreInfo);
+
 		const buttonMoreInfo = document.createElement('button');
 		buttonMoreInfo.innerHTML = `подробней`;
 		buttonMoreInfo.setAttribute('onclick', `toggleStateTableStats(${i})`);
@@ -63,8 +72,7 @@ const baseMarkup = data => {
 		if (!data[i].miner_data) {
 			buttonMoreInfo.setAttribute('disabled', true);
 		}
-
-		buttonSection.append(buttonMoreInfo);
+		divToButtonMoreInfo.append(buttonMoreInfo);
 	}
 };
 
@@ -108,24 +116,25 @@ const getAllRigsToCheck = data => {
 	currentMassId = [];
 };
 
-const chackAllRigsOnOffline = data => {
-	for (let i = 0; i < data.length; i++) {
-		if (data[i].status !== 'OK') {
-			const buttonMoreInfoOffline = document.getElementById(
-				`more_info_rig_${i}`
-			);
+let arrayStatusRigs = [];
 
-			const tableMinerStatsOffline = document.getElementById(
-				`table_rig_miner_stats_${i}`
-			);
-			const tableDeviceStatsOffline = document.getElementById(
-				`table_rig_devices_stats_${i}`
-			);
-			if (tableMinerStatsOffline === 'null') {
-			}
-			buttonMoreInfoOffline.setAttribute('disabled', true);
-			tableMinerStatsOffline.setAttribute('style', `display:none`);
-			tableDeviceStatsOffline.setAttribute('style', `display:none`);
+const chackAllRigsOnOffline = data => {
+	let id,
+		status = null;
+
+	if (arrayStatusRigs.length === 0) {
+		for (let i = 0; i < data.length; i++) {
+			id = data[i].id;
+			status = data[i].status;
+
+			arrayStatusRigs.push({ id, status });
+		}
+	}
+	for (let i = 0; i < data.length; i++) {
+		if (data[i].status.substr(0, 2) !== arrayStatusRigs[i].status.substr(0, 2)) {
+			console.log('reboot');
+			console.log('DATA ', data[i].status.substr(0, 2), 'Arr ', arrayStatusRigs[i].status.substr(0, 2));
+			location.reload();
 		}
 	}
 };
@@ -133,9 +142,7 @@ const chackAllRigsOnOffline = data => {
 const randerMainStats = data => {
 	try {
 		for (let i = 0; i < data.length; i++) {
-			const curentRig = document.getElementById(
-				`table_rig_miner_stats_main_${i}`
-			);
+			const curentRig = document.getElementById(`table_rig_miner_stats_main_${i}`);
 
 			for (let item in data[i]) {
 				if (typeof data[i][item] !== 'object') {
@@ -203,12 +210,8 @@ const fillTableMinerStat = (response, i) => {
 	try {
 		for (let key in response) {
 			if (typeof response[key] !== 'object') {
-				let elem_name = document.getElementById(
-					`rig_${i}_row_${j}_colum_1_${key}`
-				);
-				let elem_value = document.getElementById(
-					`rig_${i}_row_${j}_colum_2_${key}`
-				);
+				let elem_name = document.getElementById(`rig_${i}_row_${j}_colum_1_${key}`);
+				let elem_value = document.getElementById(`rig_${i}_row_${j}_colum_2_${key}`);
 				elem_name.innerHTML = `${key}`;
 				elem_value.innerHTML = `${response[key]}`;
 			}
@@ -243,9 +246,7 @@ const getDataToRanderOrFillDeviceStat = (renderTableDeviceStat, data) => {
 
 function renderTableDeviceStat(row, col, rig) {
 	try {
-		const tableRigDevicesStats = document.getElementById(
-			`table_rig_devices_stats_${rig}`
-		);
+		const tableRigDevicesStats = document.getElementById(`table_rig_devices_stats_${rig}`);
 
 		for (let i = 0; i < row.length + 1; i++) {
 			const ro = tableRigDevicesStats.insertRow(-1);
@@ -277,9 +278,7 @@ function fillTableDeviceStat(data, rows, rig) {
 		for (let i = 0; i < rows; i++) {
 			let j = 0;
 			for (let device in data[i]) {
-				let key = document.getElementById(
-					`rig_${rig}_devices_id_${i + 1}_${j}`
-				);
+				let key = document.getElementById(`rig_${rig}_devices_id_${i + 1}_${j}`);
 				key.innerHTML = `${data[i][device]}`;
 				j++;
 			}
@@ -313,7 +312,7 @@ setInterval(function () {
 // ДОБАВИТЬ РИГ
 
 const getAllClients = async () => {
-	await fetch('/getAllOnline').then(response =>
+	await fetch('/getAddList').then(response =>
 		response.text().then(response => {
 			renderWindowAllClients(response.split('\r\n'));
 		})
@@ -323,13 +322,21 @@ const getAllClients = async () => {
 const renderWindowAllClients = response => {
 	try {
 		const allRigs = document.querySelector('.all_rigs');
-
 		allRigs.innerHTML = '';
-		for (let i = 0; i < response.length; i++) {
+		if (response[0]) {
+			for (let i = 0; i < response.length; i++) {
+				const div = document.createElement('div');
+				div.innerHTML = `
+				<button id="button_rig_${i}" onclick="chooseRigOnModalWindow('${response[i]}')">${response[i]}</button>
+			`;
+				div.classList = 'rig';
+				allRigs.append(div);
+			}
+		} else {
 			const div = document.createElement('div');
 			div.innerHTML = `
-            <button id="button_rig_${i}" onclick="chooseRigOnModalWindow('${response[i]}')">${response[i]}</button>
-        `;
+				<span>Нет доступных ригов для добавления</span>
+			`;
 			div.classList = 'rig';
 			allRigs.append(div);
 		}
@@ -339,6 +346,7 @@ const renderWindowAllClients = response => {
 };
 
 const chooseRigOnModalWindow = res => {
+	res = res.split(' ')[0];
 	fetch(`/addRig/${res}`).then(function (response) {
 		console.warn(response.text());
 	});
@@ -393,9 +401,7 @@ const removeRig = i => {
 
 const toggleStateTableStats = i => {
 	const tableMinerStats = document.querySelector(`#table_rig_miner_stats_${i}`);
-	const tableDeviceStats = document.querySelector(
-		`#table_rig_devices_stats_${i}`
-	);
+	const tableDeviceStats = document.querySelector(`#table_rig_devices_stats_${i}`);
 	const buttonMoreInfo = document.querySelector(`#more_info_rig_${i}`);
 
 	if (tableMinerStats.style.display === 'none') {
@@ -407,4 +413,18 @@ const toggleStateTableStats = i => {
 		tableMinerStats.setAttribute('style', `display:none`);
 		tableDeviceStats.setAttribute('style', `display:none`);
 	}
+};
+
+//Переход на AnyDesk
+
+const routToAnydesk = i => {
+	const buttonAnyDesk = document.querySelector(`#id_${i}`);
+
+	fetch(`/getAnydesk/${buttonAnyDesk.innerHTML}`).then(function (response) {
+		// console.log(response.text().then (response) => {response});
+		response.text().then(response => {
+			console.log(response);
+			window.open(`https://go.anydesk.com/${response}`);
+		});
+	});
 };
