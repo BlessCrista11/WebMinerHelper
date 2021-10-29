@@ -1,12 +1,22 @@
 const wrapper = document.querySelector('.wrapper');
 var currentData = null;
-console.log(window.location.href);
+var mainToken = null;
+
+// console.log(window.location.href);
 
 const getData = async () => {
-	currentData = await fetch('/stat')
+	currentData = await fetch('/stat', {
+		headers: {
+			token: mainToken,
+		},
+	})
 		.then(response => response.json())
 		.then(response => {
-			return response;
+			if (response.isError) {
+				alert('что то пошло не так! ' + response.data);
+				return null;
+			}
+			return response.data;
 		});
 };
 
@@ -56,7 +66,7 @@ const baseMarkup = data => {
 		buttonSection.append(buttonDelete);
 
 		const buttonAnyDesk = document.createElement('button');
-		buttonAnyDesk.innerHTML = `AnyDesk`;
+		buttonAnyDesk.innerHTML = `Anydesk`;
 		buttonAnyDesk.setAttribute('onclick', `routToAnydesk(${i})`);
 		buttonAnyDesk.setAttribute('id', `anydesk_rig_${i}`);
 		buttonSection.append(buttonAnyDesk);
@@ -77,10 +87,17 @@ const baseMarkup = data => {
 };
 
 const errorInfo = err => {
-	fetch(`/webException/
+	fetch(
+		`/webException/
 	Текст ошибки: ${err}, 
 	строка ошибки в файле:${err.fileName} ${err.lineNumber}, 
-	Информация о браузере: ${navigator.userAgent}`);
+	Информация о браузере: ${navigator.userAgent}`,
+		{
+			headers: {
+				token: mainToken,
+			},
+		}
+	);
 
 	console.warn(`Текст ошибки: ${err}`);
 	console.warn(`строка ошибки в файле:${err.fileName} ${err.lineNumber}`);
@@ -288,8 +305,55 @@ function fillTableDeviceStat(data, rows, rig) {
 	}
 }
 
+const getLinkTail = () => {
+	return window.location.pathname.substring(1);
+};
+
+const isCorrectToken = async () => {
+	if (getLinkTail()) {
+		localStorage.removeItem('token');
+		localStorage.removeItem('name');
+		let rootJson = await requestPermanentToken();
+
+		if (rootJson.isError) {
+			alert('Ошибка токена: ' + rootJson.data);
+		} else {
+			let posOfDelim = rootJson.data.indexOf(' ');
+			localStorage.setItem('token', rootJson.data.substr(0, posOfDelim));
+			localStorage.setItem('name', rootJson.data.substr(posOfDelim));
+		}
+
+		window.location.href = window.location.origin;
+	}
+
+	if (localStorage.getItem('token') === null) {
+		alert('Сори,токина нет. Иди в телегу');
+		location.reload();
+	}
+	mainToken = localStorage.getItem('token');
+
+	if (localStorage.getItem('name') !== null) {
+		// mainToken = localStorage.getItem('name');
+		const userName = document.getElementById('user_name');
+		userName.innerHTML = localStorage.getItem('name');
+	}
+};
+
+const requestPermanentToken = async () => {
+	return await fetch(`/getToken/${window.location.pathname.substring(1)}`)
+		.then(response => response.json())
+		.then(response => {
+			return response;
+		});
+};
+
 const randerPage = async () => {
+	await isCorrectToken();
+
 	await getData();
+	if (currentData === null) {
+		return;
+	}
 	baseMarkup(currentData);
 	randerMainStats(currentData);
 
@@ -301,7 +365,9 @@ randerPage();
 
 setInterval(function () {
 	getData();
-
+	if (currentData === null) {
+		return;
+	}
 	fillMainStats(currentData);
 	chackAllRigsOnOffline(currentData);
 	getAllRigsToCheck(currentData);
@@ -312,9 +378,13 @@ setInterval(function () {
 // ДОБАВИТЬ РИГ
 
 const getAllClients = async () => {
-	await fetch('/getAddList').then(response =>
-		response.text().then(response => {
-			renderWindowAllClients(response.split('\r\n'));
+	await fetch('/getAddList', {
+		headers: {
+			token: mainToken,
+		},
+	}).then(response =>
+		response.json().then(response => {
+			renderWindowAllClients(response.data);
 		})
 	);
 };
@@ -347,7 +417,11 @@ const renderWindowAllClients = response => {
 
 const chooseRigOnModalWindow = res => {
 	res = res.split(' ')[0];
-	fetch(`/addRig/${res}`).then(function (response) {
+	fetch(`/addRig/${res}`, {
+		headers: {
+			token: mainToken,
+		},
+	}).then(function (response) {
 		console.warn(response.text());
 	});
 	location.reload();
@@ -381,7 +455,11 @@ const closeModalWindow = event => {
 const rebootRig = i => {
 	const buttonReboot = document.querySelector(`#id_${i}`);
 
-	fetch(`/rebootRig/${buttonReboot.innerHTML}`).then(function (response) {
+	fetch(`/rebootRig/${buttonReboot.innerHTML}`, {
+		headers: {
+			token: mainToken,
+		},
+	}).then(function (response) {
 		console.log(response.text());
 	});
 };
@@ -391,7 +469,11 @@ const rebootRig = i => {
 const removeRig = i => {
 	const buttonRemove = document.querySelector(`#id_${i}`);
 
-	fetch(`/removeRig/${buttonRemove.innerHTML}`).then(function (response) {
+	fetch(`/removeRig/${buttonRemove.innerHTML}`, {
+		headers: {
+			token: mainToken,
+		},
+	}).then(function (response) {
 		console.log(response.text());
 	});
 	location.reload();
@@ -420,11 +502,14 @@ const toggleStateTableStats = i => {
 const routToAnydesk = i => {
 	const buttonAnyDesk = document.querySelector(`#id_${i}`);
 
-	fetch(`/getAnydesk/${buttonAnyDesk.innerHTML}`).then(function (response) {
+	fetch(`/getAnydesk/${buttonAnyDesk.innerHTML}`, {
+		headers: {
+			token: mainToken,
+		},
+	}).then(function (response) {
 		// console.log(response.text().then (response) => {response});
-		response.text().then(response => {
-			console.log(response);
-			window.open(`https://go.anydesk.com/${response}`);
+		response.json().then(response => {
+			window.open(`https://go.anydesk.com/${response.data}`);
 		});
 	});
 };
