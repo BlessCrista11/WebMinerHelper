@@ -1,8 +1,41 @@
 const wrapper = document.querySelector('.wrapper');
+const thirdPageButton = document.getElementById('third_page_button');
 var currentData = null;
 var mainToken = null;
 
 // console.log(window.location.href);
+
+const blockedMessage = messageError => {
+	const header = document.querySelector('header');
+
+	const body = document.querySelector('body');
+	const blockedMessageWindow = document.createElement('div');
+	blockedMessageWindow.classList.add('blocked_message_wrapper');
+
+	blockedMessageWindow.innerHTML = `
+		<div style="color: rgb(228,91,71); font-size: 200px;">&#451</div>
+		<div>
+			<span style="color: rgb(228,91,71)">Error occured!</span>
+			</br>
+			</br>
+			<span>${messageError.data}</span>
+			</br>
+			</br>
+			<p>
+			In case of any errors try to reload this page. </br> 
+			If reloading will not help try to get new link from <a href="https://web.telegram.org/z/#1755458126">@gminerHelperBot</a> whith command <span style="font-weight: bold">"/getlink"</span>.</br>
+			If you need some assistance during the usage please contact with administrators in Telegram
+			<a href="https://web.telegram.org/z/#572561813">@AlexeiKislinskii</a>
+			<a href="https://web.telegram.org/z/#327776117">@Andrey_Kislinskiy</a></p>
+		</div>
+		
+	`;
+	body.append(blockedMessageWindow);
+	wrapper.style.display = 'none';
+	header.style.display = 'none';
+
+	clearTimeout(intreval);
+};
 
 const getData = async () => {
 	currentData = await fetch('/stat', {
@@ -13,7 +46,11 @@ const getData = async () => {
 		.then(response => response.json())
 		.then(response => {
 			if (response.isError) {
-				alert('что то пошло не так! ' + response.data);
+				// alert('что то пошло не так! ' + response.data);
+				blockedMessage(response);
+
+				// console.log('что то пошло не так! ' + response.data);
+				// console.log('object');
 				return null;
 			}
 			return response.data;
@@ -21,6 +58,7 @@ const getData = async () => {
 };
 
 const baseMarkup = data => {
+	thirdPageButton.setAttribute('onclick', `togglePages()`);
 	for (let i = 0; i < data.length; i++) {
 		const section = document.createElement('section');
 		// section.className = `table_rig_${i}`; сделать единый класс для стилизации
@@ -66,7 +104,7 @@ const baseMarkup = data => {
 		buttonSection.append(buttonDelete);
 
 		const buttonAnyDesk = document.createElement('button');
-		buttonAnyDesk.innerHTML = `Anydesk`;
+		buttonAnyDesk.innerHTML = `AnyDesk`;
 		buttonAnyDesk.setAttribute('onclick', `routToAnydesk(${i})`);
 		buttonAnyDesk.setAttribute('id', `anydesk_rig_${i}`);
 		buttonSection.append(buttonAnyDesk);
@@ -305,18 +343,19 @@ function fillTableDeviceStat(data, rows, rig) {
 	}
 }
 
-const getLinkTail = () => {
-	return window.location.pathname.substring(1);
-};
+// const getLinkTail = () => {
+// 	return window.location.pathname.substring(1);
+// };
 
 const isCorrectToken = async () => {
-	if (getLinkTail()) {
+	if (window.location.pathname.substring(1)) {
 		localStorage.removeItem('token');
 		localStorage.removeItem('name');
-		let rootJson = await requestPermanentToken();
+		var rootJson = await requestPermanentToken();
 
 		if (rootJson.isError) {
-			alert('Ошибка токена: ' + rootJson.data);
+			// alert('Ошибка токена: ' + rootJson.data);
+			blockedMessage(rootJson);
 		} else {
 			let posOfDelim = rootJson.data.indexOf(' ');
 			localStorage.setItem('token', rootJson.data.substr(0, posOfDelim));
@@ -327,8 +366,14 @@ const isCorrectToken = async () => {
 	}
 
 	if (localStorage.getItem('token') === null) {
-		alert('Сори,токина нет. Иди в телегу');
-		location.reload();
+		// alert('Сори,токина нет. Иди в телегу');
+		const messageError = {
+			data: `This browser is not registered.
+		`,
+		};
+		blockedMessage(messageError);
+		return;
+		// location.reload();
 	}
 	mainToken = localStorage.getItem('token');
 
@@ -349,7 +394,9 @@ const requestPermanentToken = async () => {
 
 const randerPage = async () => {
 	await isCorrectToken();
-
+	if (mainToken === null) {
+		return;
+	}
 	await getData();
 	if (currentData === null) {
 		return;
@@ -363,7 +410,7 @@ const randerPage = async () => {
 
 randerPage();
 
-setInterval(function () {
+const collectAndFill = () => {
 	getData();
 	if (currentData === null) {
 		return;
@@ -373,7 +420,14 @@ setInterval(function () {
 	getAllRigsToCheck(currentData);
 	getDataToRanderOrFillStat(fillTableMinerStat, currentData);
 	getDataToRanderOrFillDeviceStat(fillTableDeviceStat, currentData);
-}, 1000);
+};
+
+var intreval;
+if (mainToken !== null) {
+	intreval = setInterval(() => {
+		collectAndFill();
+	}, 1000);
+}
 
 // ДОБАВИТЬ РИГ
 
@@ -512,4 +566,23 @@ const routToAnydesk = i => {
 			window.open(`https://go.anydesk.com/${response.data}`);
 		});
 	});
+};
+
+const togglePages = () => {
+	const thirdPage = document.querySelector('.third_page');
+	if (thirdPage.style.display === 'none') {
+		wrapper.style.display = 'none';
+		thirdPage.style.display = 'block';
+		thirdPageButton.innerHTML = 'на страницу 2';
+
+		clearTimeout(intreval);
+	} else if (wrapper.style.display === 'none') {
+		wrapper.style.display = 'block';
+		thirdPage.style.display = 'none';
+		thirdPageButton.innerHTML = 'на страницу 3';
+
+		setInterval(() => {
+			collectAndFill();
+		}, 1000);
+	}
 };

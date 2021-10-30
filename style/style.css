@@ -262,3 +262,38 @@ tr {
 .button_more_info {
 	float: right;
 }
+.third_page span {
+	color: #888;
+	font-size: 30px;
+}
+
+.blocked_message_wrapper {
+	background-color: #272727;
+	margin: 15% auto;
+	/* padding: 40px; */
+	border: 3px solid rgb(228, 91, 71);
+	width: 50%;
+	min-height: 100px;
+}
+
+.blocked_message_wrapper {
+	display: flex;
+	padding: 32px 0;
+}
+blocked_message_wrapper div {
+	justify-content: space-between;
+}
+.blocked_message_wrapper span,
+p {
+	color: #888;
+	font-size: 25px;
+}
+.blocked_message_wrapper p {
+	color: #888;
+	font-size: 20px;
+}
+a,
+a:visited {
+	/* color: #0000ff; */
+	color: rgb(0, 134, 255);
+}
