@@ -4,20 +4,17 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Web Miner Helper</title>
-		<link rel="shortcut icon" href="image/favicon-32x32.png" type="image/png" />
 		<link rel="stylesheet" href="./style/style.css" />
-		<!-- <script src="./script/test.js" defer></script> -->
-		<!-- <script src="./script/test3.js" defer></script> -->
-		<script src="./script/script.js" defer></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment-with-locales.min.js"></script>
+		<script type="module" src="./script/script.js" defer></script>
 	</head>
 
 	<body>
 		<header>
-			<div class="user_info_modal">
-				<span id="user_name">имя</span>
-			</div>
 			<div class="header_button_modal">
-				<button id="modal_button_id">Добавить риг</button>
+				<button class="button_hover" id="to_main_page" style="display: none">на главную</button>
+				<button id="modal_button_id" style="display: block">Добавить риг</button>
 				<div id="modal_window_id" class="modal">
 					<div class="modal_content">
 						<div class="modal_inner">
@@ -27,14 +24,59 @@
 						<div class="all_rigs"></div>
 					</div>
 				</div>
-
-				<button id="third_page_button">на страницу 3</button>
+			</div>
+			<div class="user_info_modal">
+				<span id="user_name">имя</span>
 			</div>
 		</header>
 
 		<div class="wrapper" style="display: block"></div>
-		<div class="third_page" style="display: none">
-			<span>Это третья страница</span>
+
+		<div class="power_monitor_page" style="display: none">
+			<span id="chart_name">ИМЯ</span>
+			<canvas id="myChart"></canvas>
+			<div class="range_section">
+				<p>Выбери интервал!</p>
+				<div class="interval_toggle">
+					<input type="radio" id="choice_day" name="interval_toggle" value="day" checked />
+					<label for="Choice_day">Дни</label>
+					<input type="radio" id="choice_minute" name="interval_toggle" value="minute" />
+					<label for="Choice_minute">минуты</label>
+				</div>
+
+				<div class="range">
+					<span>От:</span>
+					<span>До:</span>
+				</div>
+
+				<div class="range">
+					<span>Выбор даты</span>
+					<input class="input_range" type="date" id="date_from_days" min="2021-09-01" max="" name="name1" onkeydown="return false" />
+					<input class="input_range" type="date" id="date_till_days" min="2021-09-01" max="" name="name2" onkeydown="return false" />
+				</div>
+				<div class="range">
+					<span>Выбор часов</span>
+					<input class="input_range input_range_number" id="date_from_hour" type="number" min="0" max="23" value="00" />
+					<input class="input_range input_range_number" id="date_till_hour" type="number" min="0" max="23" value="23" />
+				</div>
+				<div class="range">
+					<span>Выбор минут</span>
+					<input class="input_range input_range_number" id="date_from_minute" type="number" min="0" max="59" value="00" />
+					<input class="input_range input_range_number" id="date_till_minute" type="number" min="0" max="59" value="59" />
+				</div>
+
+				<button id="get_range_button" class="button_hover">получить!</button>
+			</div>
+		</div>
+
+		<div id="modal_window_info_id" class="modal">
+			<div class="modal_content">
+				<div class="modal_inner">
+					<div class="modal_title">Информационное окно</div>
+					<div class="close_modal_window">&times</div>
+				</div>
+				<div class="modal_info_message"></div>
+			</div>
 		</div>
 	</body>
 </html>

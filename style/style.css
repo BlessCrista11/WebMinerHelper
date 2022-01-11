@@ -137,9 +137,9 @@ button {
 	border-radius: 5px;
 }
 
-button:hover {
+.button_hover:hover {
 	color: #fff;
-	/* border: solid 2px #000; */
+
 	background: #3f3f3f;
 }
 
@@ -162,12 +162,11 @@ header {
 }
 section {
 	background: #4f4f4f;
-	/* margin: 16px; */
+
 	padding: 16px;
 }
 
 [id^='button_section_rig_'] {
-	/* background: #ff0000; */
 	margin: 16px 0;
 }
 [id^='button_section_rig_'] button {
@@ -176,7 +175,7 @@ section {
 table {
 	width: 100%;
 	background: rgb(48, 47, 47);
-	/* margin: 16px; */
+
 	margin-top: 16px;
 }
 td {
@@ -195,7 +194,7 @@ tr {
 	top: 0;
 	width: 100%;
 	height: 100%;
-	/* overflow: auto; */
+
 	background-color: rgba(0, 0, 0, 0.6);
 	display: none;
 }
@@ -231,7 +230,7 @@ tr {
 	color: #888;
 	font-size: 20px;
 	display: flex;
-	/* align-items: center; */
+
 	justify-content: space-between;
 	padding: 8px;
 }
@@ -242,7 +241,6 @@ tr {
 }
 
 .table_rig_miner_stats_main {
-	/* margin: 16px; */
 	padding: 16px;
 	background-color: #3f3f3f;
 	display: flex;
@@ -270,7 +268,7 @@ tr {
 .blocked_message_wrapper {
 	background-color: #272727;
 	margin: 15% auto;
-	/* padding: 40px; */
+
 	border: 3px solid rgb(228, 91, 71);
 	width: 50%;
 	min-height: 100px;
@@ -294,6 +292,42 @@ p {
 }
 a,
 a:visited {
-	/* color: #0000ff; */
 	color: rgb(0, 134, 255);
+}
+
+.range_section > input {
+	display: block;
+}
+
+.range {
+	display: inline-block;
+}
+
+.input_range {
+	margin: 12px;
+
+	display: block;
+}
+
+@keyframes glowing {
+	50% {
+		box-shadow: 0 0 30px 10px #fc0000;
+	}
+}
+
+.range > span {
+	font-size: large;
+	margin-left: 12px;
+	display: block;
+}
+.interval_toggle {
+	margin-left: 20%;
+	margin-bottom: 32px;
+}
+
+#chart_name {
+	color: #fff;
+	margin: 16px 0;
+	display: block;
+	text-align: center;
 }
