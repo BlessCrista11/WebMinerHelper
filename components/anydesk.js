@@ -9,8 +9,10 @@ const routToAnydesk = i => {
 		},
 	}).then(response => {
 		response.json().then(response => {
-			console.log(response.data);
-			window.open(`https://go.anydesk.com/${response.data}`);
+			if (response.isError === false) {
+				console.log(response.isError);
+				window.open(`https://go.anydesk.com/${response.data}`);
+			}
 		});
 	});
 };

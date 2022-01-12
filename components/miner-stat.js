@@ -43,8 +43,8 @@ export const renderTableMinerStat = (content, i) => {
 			if (typeof content[key] !== 'object') {
 				const tr = document.createElement('tr');
 				tr.innerHTML = `
-                <td id="rig_${i}_row_${j}_colum_1_${key}"> </td>
-                <td id="rig_${i}_row_${j}_colum_2_${key}"> </td>                            
+                <td id="rig_${i}_row_${j}_colum_1"> </td>
+                <td id="rig_${i}_row_${j}_colum_2"> </td>                            
             `;
 				tableRigStats.append(tr);
 			}
@@ -57,11 +57,12 @@ export const renderTableMinerStat = (content, i) => {
 
 export const fillTableMinerStat = (response, i) => {
 	let j = 0;
+	var key = null;
 	try {
-		for (let key in response) {
+		for (key in response) {
 			if (typeof response[key] !== 'object') {
-				let elem_name = document.getElementById(`rig_${i}_row_${j}_colum_1_${key}`);
-				let elem_value = document.getElementById(`rig_${i}_row_${j}_colum_2_${key}`);
+				let elem_name = document.getElementById(`rig_${i}_row_${j}_colum_1`);
+				let elem_value = document.getElementById(`rig_${i}_row_${j}_colum_2`);
 				elem_name.innerHTML = `${key}`;
 				elem_value.innerHTML = `${response[key]}`;
 			}
