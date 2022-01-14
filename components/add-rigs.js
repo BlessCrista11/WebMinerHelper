@@ -1,5 +1,6 @@
 import { mainToken } from '../components/token.js';
 import errorInfo from '../components/error.js';
+import blockedMessage from '../components/blocked-message.js';
 import { openModalWindow, closeModalWindow } from '../components/modal-window.js';
 
 const getAllClients = async () => {
@@ -9,6 +10,11 @@ const getAllClients = async () => {
 		},
 	}).then(response =>
 		response.json().then(response => {
+			if (response.isError) {
+				blockedMessage(response);
+
+				return null;
+			}
 			renderWindowAllClients(response.data);
 		})
 	);

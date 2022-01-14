@@ -1,4 +1,5 @@
 import { mainToken } from '../components/token.js';
+import blockedMessage from '../components/blocked-message.js';
 import { openModalWindow, closeModalWindow, fillModalWindw } from '../components/modal-window.js';
 
 const rebootRig = i => {
@@ -13,7 +14,11 @@ const rebootRig = i => {
 				token: mainToken,
 			},
 		}).then(function (response) {
-			console.log(response.text());
+			if (response.isError) {
+				blockedMessage(response);
+
+				return null;
+			}
 		});
 	};
 
