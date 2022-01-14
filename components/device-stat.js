@@ -30,7 +30,6 @@ export function renderTableDeviceStat(row, col, rig) {
 			const ro = tableRigDevicesStats.insertRow(-1);
 			for (var j = 0; j < col; j++) {
 				var ce = ro.insertCell(-1);
-				// ce.innerHTML = j + 1;
 
 				const id = document.createAttribute('id');
 				id.value = `rig_${rig}_devices_id_${i}_${j}`;

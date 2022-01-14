@@ -1,5 +1,4 @@
 import { mainToken } from './token.js';
-
 const routToAnydesk = i => {
 	const buttonAnyDesk = document.querySelector(`#id_${i}`);
 

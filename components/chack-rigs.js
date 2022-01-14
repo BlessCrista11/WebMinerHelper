@@ -52,6 +52,5 @@ export const chackAllRigsOnOffline = data => {
 let oldArrayFildName = [];
 let currentArrayFildName = [];
 function deepEqual(obj1, obj2) {
-	// console.log('object');
 	return JSON.stringify(obj1) === JSON.stringify(obj2);
 }

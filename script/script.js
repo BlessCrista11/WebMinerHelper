@@ -83,14 +83,3 @@ export const stopInterval = () => {
 	clearInterval(intreval);
 };
 startInterval();
-
-window.onclick = event => {
-	closeModalWindow(event);
-};
-
-const closeModalWindow = event => {
-	if (event.target.hasAttribute('class')) {
-		let modal = document.querySelector('.modal');
-		modal.style.display = 'none';
-	}
-};

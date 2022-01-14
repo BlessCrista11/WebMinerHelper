@@ -63,7 +63,7 @@ export const baseMarkup = data => {
 		buttonAnyDesk.setAttribute('id', `anydesk_rig_${i}`);
 		buttonAnyDesk.classList.add('button_hover');
 
-		buttonSection.append(buttonAnyDesk);
+		buttonSection.append(buttonAnyDesk);}
 
 		const divToButtonMoreInfo = document.createElement('div');
 		divToButtonMoreInfo.classList.add('button_more_info');
@@ -83,7 +83,6 @@ export const baseMarkup = data => {
 
 		const powerMonitor = document.createElement('button');
 		powerMonitor.innerHTML = 'Power Monitor';
-
 		powerMonitor.addEventListener('click', () => {
 			openPowerMonitor(i, data);
 		});

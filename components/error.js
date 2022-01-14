@@ -32,6 +32,6 @@ const errorInfo = err => {
 	console.warn(`строка ошибки в файле:${err.fileName} ${err.lineNumber}`);
 	console.warn(`Информация о браузере: ${navigator.userAgent}`);
 	console.log(' ');
-	// location.reload();
+	location.reload();
 };
 export default errorInfo;

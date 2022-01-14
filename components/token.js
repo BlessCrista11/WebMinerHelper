@@ -26,7 +26,6 @@ export const isCorrectToken = async () => {
 		};
 		blockedMessage(messageError);
 		return;
-		// location.reload();
 	}
 	mainToken = localStorage.getItem('token');
 

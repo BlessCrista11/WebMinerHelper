@@ -12,23 +12,25 @@
 
 	<body>
 		<header>
-			<div class="header_button_modal">
+			<div>
 				<button class="button_hover" id="to_main_page" style="display: none">на главную</button>
+
 				<button id="modal_button_id" style="display: block">Добавить риг</button>
-				<div id="modal_window_id" class="modal">
-					<div class="modal_content">
-						<div class="modal_inner">
-							<div class="modal_title">Добавить риг</div>
-							<div class="close_modal_window">&times</div>
-						</div>
-						<div class="all_rigs"></div>
-					</div>
-				</div>
 			</div>
-			<div class="user_info_modal">
+			<div>
 				<span id="user_name">имя</span>
 			</div>
 		</header>
+
+		<div id="modal_window_id" class="modal">
+			<div class="modal_content">
+				<!-- <div class="modal_inner">
+					<div class="modal_title">55</div>
+					<div class="close_modal_window">&times</div>
+				</div> -->
+				<!-- <div class="all_rigs"></div> -->
+			</div>
+		</div>
 
 		<div class="wrapper" style="display: block"></div>
 
@@ -66,16 +68,6 @@
 				</div>
 
 				<button id="get_range_button" class="button_hover">получить!</button>
-			</div>
-		</div>
-
-		<div id="modal_window_info_id" class="modal">
-			<div class="modal_content">
-				<div class="modal_inner">
-					<div class="modal_title">Информационное окно</div>
-					<div class="close_modal_window">&times</div>
-				</div>
-				<div class="modal_info_message"></div>
 			</div>
 		</div>
 	</body>

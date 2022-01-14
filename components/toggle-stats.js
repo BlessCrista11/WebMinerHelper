@@ -1,5 +1,3 @@
-// ИНФО РИГА
-
 const toggleStateTableStats = i => {
 	const tableMinerStats = document.querySelector(`#table_rig_miner_stats_${i}`);
 	const tableDeviceStats = document.querySelector(`#table_rig_devices_stats_${i}`);

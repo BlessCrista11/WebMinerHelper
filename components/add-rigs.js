@@ -1,5 +1,6 @@
 import { mainToken } from '../components/token.js';
 import errorInfo from '../components/error.js';
+import { openModalWindow, closeModalWindow } from '../components/modal-window.js';
 
 const getAllClients = async () => {
 	await fetch('/getAddList', {
@@ -45,7 +46,7 @@ const renderWindowAllClients = response => {
 
 const chooseRigOnModalWindow = res => {
 	res = res.split(' ')[0];
-	console.log('2121');
+
 	fetch(`/addRig/${res}`, {
 		headers: {
 			token: mainToken,
@@ -53,22 +54,22 @@ const chooseRigOnModalWindow = res => {
 	}).then(function (response) {
 		console.warn(response.text());
 	});
+	location.reload();
 };
 
+const modalContent = document.querySelector('.modal_content');
 const addNewRig = () => {
 	let btn = document.querySelector('#modal_button_id');
 
 	btn.addEventListener('click', () => {
 		getAllClients();
+		openModalWindow('Добавить риг');
 
-		let modal = document.querySelector('#modal_window_id');
+		const allRigs = document.createElement('div');
+		allRigs.setAttribute('class', 'all_rigs');
+		modalContent.append(allRigs);
 
-		modal.style.display = 'block';
-
-		let close = modal.querySelector('.close_modal_window');
-		close.addEventListener('click', () => {
-			modal.style.display = 'none';
-		});
+		closeModalWindow();
 	});
 };
 

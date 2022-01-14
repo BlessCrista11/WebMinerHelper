@@ -137,6 +137,7 @@ export const openPowerMonitor = async (i, data) => {
 
 	setCurrentDate();
 
+
 	getRangeButton.addEventListener('click', onBtnDataClick);
 
 	changePage();
@@ -306,12 +307,15 @@ const randerChart = () => {
 		fillArraysFromDataInMinutes();
 	}
 
+	
+
 	myChart = new Chart(ctx, {
 		type: 'bar',
 		data: {
 			labels: arreyOfDate,
 			datasets: [
 				{
+
 					data: powerData,
 					backgroundColor: ['rgb(50,80,0,0.2)'],
 					borderColor: ['rgb(63, 128, 4)'],
