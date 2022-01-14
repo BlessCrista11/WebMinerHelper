@@ -14,12 +14,16 @@ const removeRig = i => {
 			headers: {
 				token: mainToken,
 			},
-		}).then(function (response) {
-			if (response.isError) {
-				blockedMessage(response);
-				return null;
-			}
+		}).then(response => {
+			response.json().then(response => {
+				if (response.isError === false) {
+					return false;
+				} else {
+					blockedMessage(response);
+				}
+			});
 		});
+
 		location.reload();
 	};
 

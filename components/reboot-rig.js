@@ -9,16 +9,18 @@ const rebootRig = i => {
 	openModalWindow(`пререзагрузить риг ${rebootRigMAC.innerHTML}?`);
 
 	const fetchReboot = () => {
-		fetch(`/rebootRig/${buttonReboot.innerHTML}`, {
+		fetch(`/rebootRig/${rebootRigMAC.innerHTML}`, {
 			headers: {
 				token: mainToken,
 			},
-		}).then(function (response) {
-			if (response.isError) {
-				blockedMessage(response);
-
-				return null;
-			}
+		}).then(response => {
+			response.json().then(response => {
+				if (response.isError === false) {
+					return false;
+				} else {
+					blockedMessage(response);
+				}
+			});
 		});
 	};
 
