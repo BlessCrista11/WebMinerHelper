@@ -5,14 +5,12 @@ import blockedMessage from '../blocked-message.js';
 
 const choiceDay = document.querySelector('#choice_day');
 const choiceMinute = document.querySelector('#choice_minute');
-const inputRangeNumber = document.querySelectorAll('.input_range_number');
 
 const dateFromDays = document.querySelector('#date_from_days');
 const dateTillDays = document.querySelector('#date_till_days');
-const dateFromHour = document.querySelector('#date_from_hour');
-const dateTillHour = document.querySelector('#date_till_hour');
-const dateFromMinute = document.querySelector('#date_from_minute');
-const dateTillMinute = document.querySelector('#date_till_minute');
+
+const dateFromTime = document.querySelector('#date_time_from');
+const dateTillTime = document.querySelector('#date_time_till');
 
 export const powerMonitorPage = document.querySelector('.power_monitor_page');
 const getRangeButton = powerMonitorPage.querySelector('#get_range_button');
@@ -22,18 +20,15 @@ const ctx = document.getElementById('myChart');
 const setCurrentDate = () => {
 	dateFromDays.value = moment(new Date()).hour(-24).format('YYYY-MM-DD');
 	dateTillDays.value = moment(new Date()).hour(-24).format('YYYY-MM-DD');
-
-	dateFromHour.value = '00';
-	dateTillHour.value = '23';
-	dateFromMinute.value = '00';
-	dateTillMinute.value = '59';
 };
 
 const validateInputDate = () => {
 	let to = moment(new Date()).hour(-24);
+
 	dateFromDays.addEventListener('change', () => {
 		let from = moment(dateFromDays.value);
 		if (to.diff(from) < 0 || moment(dateFromDays.value) > moment(dateTillDays.value)) {
+
 			dateFromDays.style = `
 			animation: glowing 1500ms infinite;			
 			`;
@@ -46,6 +41,7 @@ const validateInputDate = () => {
 	dateTillDays.addEventListener('change', () => {
 		let from = moment(dateTillDays.value);
 		if (to.diff(from) < 0 || moment(dateFromDays.value) > moment(dateTillDays.value)) {
+			
 			dateTillDays.style = `
 			animation: glowing 1500ms infinite;			
 			`;
@@ -57,34 +53,7 @@ const validateInputDate = () => {
 	});
 };
 
-const validateInputDayAndMinute = () => {
-	const addHendlersDayMimute = (fild, from, till) => {
-		if (fild.value < from || fild.value > till) {
-			fild.style = `
-			animation: glowing 1500ms infinite;			
-			`;
-			getRangeButton.disabled = true;
-		} else {
-			fild.style.removeProperty('animation');
-			getRangeButton.disabled = false;
-		}
-	};
-
-	dateFromHour.addEventListener('change', () => {
-		addHendlersDayMimute(dateFromHour, 0, 23);
-	});
-	dateTillHour.addEventListener('change', () => {
-		addHendlersDayMimute(dateTillHour, 0, 23);
-	});
-	dateFromMinute.addEventListener('change', () => {
-		addHendlersDayMimute(dateFromMinute, 0, 59);
-	});
-	dateTillMinute.addEventListener('change', () => {
-		addHendlersDayMimute(dateTillMinute, 0, 59);
-	});
-};
 validateInputDate();
-validateInputDayAndMinute();
 
 var arrayDataPower = null;
 let requestLink = '';
@@ -126,6 +95,7 @@ const onBtnDataClick = async () => {
 	getDataFromInput();
 
 	await getDataFromServer();
+	getTotalPrice();
 
 	myChart.destroy();
 	randerChart();
@@ -136,7 +106,6 @@ export const openPowerMonitor = async (i, data) => {
 	rigId = data[i].id;
 
 	setCurrentDate();
-
 
 	getRangeButton.addEventListener('click', onBtnDataClick);
 
@@ -168,42 +137,21 @@ const getDataFromServer = async () => {
 
 const intrevalToggle = () => {
 	choiceDay.addEventListener('change', () => {
-		inputRangeNumber.forEach(item => {
-			item.disabled = true;
-		});
+		dateFromTime.disabled = true;
+		dateTillTime.disabled = true;
 	});
 	choiceMinute.addEventListener('change', () => {
-		inputRangeNumber.forEach(item => {
-			item.disabled = false;
-		});
+		dateFromTime.disabled = false;
+		dateTillTime.disabled = false;
 	});
-
-	if (choiceDay.checked) {
-		inputRangeNumber.forEach(item => {
-			item.disabled = true;
-		});
-	}
 };
 intrevalToggle();
 
 const getDataFromInput = () => {
-	console.log('getDataFromInput');
 	if (choiceDay.checked) {
 		requestLink += '/' + dateFromDays.value + '/' + dateTillDays.value;
 	} else if (choiceMinute.checked) {
-		requestLink +=
-			'/' +
-			dateFromDays.value +
-			'_' +
-			dateFromHour.value +
-			':' +
-			dateFromMinute.value +
-			'/' +
-			dateTillDays.value +
-			'_' +
-			dateTillHour.value +
-			':' +
-			dateTillMinute.value;
+		requestLink += '/' + dateFromDays.value + '_' + dateFromTime.value + '/' + dateTillDays.value + '_' + dateTillTime.value;
 	}
 	console.log(requestLink);
 };
@@ -217,7 +165,7 @@ const countDiffDateInDays = () => {
 	let from = moment(dateFromDays.value);
 	let duration = moment.duration(till.diff(from));
 	let days = duration.asDays();
-	return Math.floor(days);
+	return Math.round(days);
 };
 
 const fillArraysFromDataInDays = () => {
@@ -245,20 +193,9 @@ const fillArraysFromDataInDays = () => {
 };
 
 const countDiffDateInMinute = () => {
-	let fromDate = {
-		y: moment(dateFromDays.value).format('YYYY'),
-		M: moment(dateFromDays.value).format('MM'),
-		d: moment(dateFromDays.value).format('DD'),
-		h: dateFromHour.value,
-		m: dateFromMinute.value,
-	};
-	let tillDate = {
-		y: moment(dateTillDays.value).format('YYYY'),
-		M: moment(dateTillDays.value).format('MM'),
-		d: moment(dateTillDays.value).format('DD'),
-		h: dateTillHour.value,
-		m: dateTillMinute.value,
-	};
+	let fromDate = moment(dateFromDays.value).add(dateFromTime.value);
+
+	let tillDate = moment(dateTillDays.value).add(dateTillTime.value);
 
 	let now = moment().add(tillDate);
 	let end = moment().add(fromDate);
@@ -266,7 +203,10 @@ const countDiffDateInMinute = () => {
 	let minutes = duration.asMinutes();
 
 	console.log(minutes);
-	return Math.floor(minutes + 1);
+	if (!Number.isInteger(minutes)) {
+		console.error('дробь');
+	}
+	return Math.round(minutes + 1);
 };
 
 const fillArraysFromDataInMinutes = () => {
@@ -278,7 +218,7 @@ const fillArraysFromDataInMinutes = () => {
 		alert('данных нет');
 	}
 
-	let tempDateString = `${dateFromDays.value}_${dateFromHour.value}:${dateFromMinute.value}`;
+	let tempDateString = `${dateFromDays.value}_${dateFromTime.value}`;
 
 	for (let i = 0; i < numberOfDays; i++) {
 		powerData.push(0);
@@ -294,6 +234,22 @@ const fillArraysFromDataInMinutes = () => {
 	if (powerData[0] === null) powerData[0] = 0;
 };
 
+const getTotalPrice = () => {
+	const totalPowerValue = document.querySelector('#total_power_value');
+	const totalVriceValue = document.querySelector('#total_price_value');
+
+	var totalPrice = 0;
+	var totalPower = 0;
+	for (let i = 0; i < arrayDataPower.length; i++) {
+		totalPower += arrayDataPower[i][1];
+		totalPrice += arrayDataPower[i][2];
+	}
+
+	console.log(Math.round(totalPrice * 100) / 100);
+	totalPowerValue.innerHTML = `${Math.round((totalPower / 1000) * 100) / 100}`;
+	totalVriceValue.innerHTML = `${Math.round(totalPrice * 100) / 100}`;
+};
+
 var myChart = null;
 const randerChart = () => {
 	const nameCurrentUert = document.getElementById('chart_name');
@@ -306,8 +262,6 @@ const randerChart = () => {
 	} else if (choiceMinute.checked && arrayDataPower !== null) {
 		fillArraysFromDataInMinutes();
 	}
-
-	
 
 	myChart = new Chart(ctx, {
 		type: 'bar',

@@ -26,6 +26,11 @@ export const baseMarkup = data => {
 		}
 
 		section.append(tableMainStats);
+
+		const arrowDiv = document.createElement('div');
+		arrowDiv.classList = 'arrow';
+		section.append(arrowDiv);
+
 		if (data[i].miner_data) {
 			const tableMinerStats = document.createElement('table');
 			tableMinerStats.setAttribute('id', `table_rig_miner_stats_${i}`);
@@ -65,22 +70,6 @@ export const baseMarkup = data => {
 
 		buttonSection.append(buttonAnyDesk);
 
-		const divToButtonMoreInfo = document.createElement('div');
-		divToButtonMoreInfo.classList.add('button_more_info');
-		buttonSection.append(divToButtonMoreInfo);
-
-		const buttonMoreInfo = document.createElement('button');
-		buttonMoreInfo.innerHTML = `подробней`;
-		buttonMoreInfo.addEventListener('click', () => toggleStateTableStats(i));
-		buttonMoreInfo.setAttribute('id', `more_info_rig_${i}`);
-		buttonMoreInfo.classList.add('button_hover');
-
-		if (!data[i].miner_data) {
-			buttonMoreInfo.setAttribute('disabled', true);
-			buttonMoreInfo.classList.remove('button_hover');
-		}
-		divToButtonMoreInfo.append(buttonMoreInfo);
-
 		const powerMonitor = document.createElement('button');
 		powerMonitor.innerHTML = 'Power Monitor';
 		powerMonitor.addEventListener('click', () => {
@@ -90,5 +79,10 @@ export const baseMarkup = data => {
 		powerMonitor.setAttribute('id', `power_monitor_rig_${i}`);
 		powerMonitor.classList.add('button_hover');
 		buttonSection.append(powerMonitor);
+
+		if (data[i].status !== 'OK') {
+			tableMainStats.setAttribute('style', `cursor: auto`);
+			section.querySelector('.arrow').classList.remove('arrow');
+		}
 	}
 };

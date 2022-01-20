@@ -37,37 +37,35 @@
 		<div class="power_monitor_page" style="display: none">
 			<span id="chart_name">ИМЯ</span>
 			<canvas id="myChart"></canvas>
-			<div class="range_section">
-				<p>Выбери интервал!</p>
-				<div class="interval_toggle">
+			<div class="range_section" style="display: inline-block; width: 100%; text-align: center">
+				<div style="display: inline-flex">
 					<input type="radio" id="choice_day" name="interval_toggle" value="day" checked />
 					<label for="Choice_day">Дни</label>
 					<input type="radio" id="choice_minute" name="interval_toggle" value="minute" />
 					<label for="Choice_minute">минуты</label>
 				</div>
+				<div>
+					<div class="range">
+						<div>
+							<span>От:</span>
+							<input class="input_range" type="date" id="date_from_days" min="2021-09-01" max="" name="name1" onkeydown="return false" />
+						</div>
+						<div>
+							<span>До:</span>
+							<input class="input_range" type="date" id="date_till_days" min="2021-09-01" max="" name="name2" onkeydown="return false" />
+						</div>
+					</div>
+					<div class="range">
+						<div><input class="input_range" type="time" id="date_time_from" value="00:00" disabled /></div>
+						<div><input class="input_range" type="time" id="date_time_till" value="23:59" disabled /></div>
+					</div>
+				</div>
+				<div class="range">
+					<p>Потрачено за выбранный период: <span id="total_power_value">0</span> kWt.</p>
+					<p>Потрачено за выбранный период: <span id="total_price_value">0</span> грн.</p>
 
-				<div class="range">
-					<span>От:</span>
-					<span>До:</span>
+					<button id="get_range_button" class="button_hover">получить!</button>
 				</div>
-
-				<div class="range">
-					<span>Выбор даты</span>
-					<input class="input_range" type="date" id="date_from_days" min="2021-09-01" max="" name="name1" onkeydown="return false" />
-					<input class="input_range" type="date" id="date_till_days" min="2021-09-01" max="" name="name2" onkeydown="return false" />
-				</div>
-				<div class="range">
-					<span>Выбор часов</span>
-					<input class="input_range input_range_number" id="date_from_hour" type="number" min="0" max="23" value="00" />
-					<input class="input_range input_range_number" id="date_till_hour" type="number" min="0" max="23" value="23" />
-				</div>
-				<div class="range">
-					<span>Выбор минут</span>
-					<input class="input_range input_range_number" id="date_from_minute" type="number" min="0" max="59" value="00" />
-					<input class="input_range input_range_number" id="date_till_minute" type="number" min="0" max="59" value="59" />
-				</div>
-
-				<button id="get_range_button" class="button_hover">получить!</button>
 			</div>
 		</div>
 	</body>
